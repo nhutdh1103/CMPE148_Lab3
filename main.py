@@ -9,14 +9,14 @@ endmsg = "\r\n.\r\n"
 
 username =  "ladybugs@gmail.com"
 password = "123456"
-email_to = "*******@sjsu.edu" # recepient email account
+email_to = "dohoangnhu.tran@sjsu.edu" # recepient email account
 
 def main():
     
 # Choose a mail server (e.g. Google mail server) and call it mailserver mailserver
 # #Fill in start 
-    MailServer = "smtp.gmail.com"
-    MailPort = 1103
+    MailServer = "smtp.freesmtpservers.com"
+    MailPort = 25
     serverPort = (MailServer, MailPort)
 
 # #Fill in end
@@ -46,24 +46,32 @@ def main():
     if recv1[:3] != '250':
         print('250 reply not received from server.\n')
 
+    base64_str = ("\x00"+username+"\x00"+password).encode()
+    base64_str = base64.b64encode(base64_str)
+    authMsg = "AUTH PLAIN ".encode()+base64_str+"\r\n".encode()
+    clientSocket.send(authMsg)
+    recv_auth = clientSocket.recv(1024)
+    print(recv_auth.decode())
+
+
 # Send MAIL FROM command and print server response.
 # Fill in start
 
-    mailFromCommand = 'MAIL FROM: <sender@email.com> \r\n'
-    clientSocket.send(mailFromCommand.encode())
+    mailFrom = "MAIL FROM:<{}>\r\n".format(username)
+    clientSocket.send(mailFrom.encode())
     recv2 = clientSocket.recv(1024)
-    print("After MAIL FROM command:", recv2.decode())
+    recv2 = recv2.decode()
+    print("Server respond to MAIL FROM: "+recv2)
 
 # Fill in end
 
 # Send RCPT TO command and print server response.
 # Fill in start
-    rcptTo = "RCPT TO: <destination@email.com> \r\n"
+    rcptTo = "RCPT TO:<{}>\r\n".format(email_to)
     clientSocket.send(rcptTo.encode())
     recv3 = clientSocket.recv(1024)
-    print("After RCPT TO command: ", recv3.decode())
-    if recv1[:3] != '250':
-        print('250 reply not received from server.\n')
+    recv3 = recv3.decode()
+    print("Server respond to RCPT TO: "+recv3)
 
 # Fill in end
 
